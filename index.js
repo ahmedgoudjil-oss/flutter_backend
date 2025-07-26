@@ -21,7 +21,7 @@ const app = express(); // ✅ تعريف app هنا أولًا
 app.use(cors()); // ✅ تفعيل cors بعد تعريف app
 
 const PORT = process.env.PORT || 3000;
-const DB = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/backend_app";
+const DB = process.env.MONGODB_URI;
 
 // إعدادات Express
 app.use(express.json());

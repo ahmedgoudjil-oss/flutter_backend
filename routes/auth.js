@@ -54,8 +54,7 @@ return res.status(400).json({msg:"User not found with this email"});
     res.status(500).json({error:e.message});
 }
 
-
-},
+});
 // update user state , city, locality
 authorRouter.put('/api/users/:id',async(req,res)=>{
 try {
@@ -79,10 +78,7 @@ try {
     res.status(500).json({error:e.message});
 }
 
-
-
-
-}));
+});
 
 // ... existing code ...
 
@@ -98,5 +94,3 @@ authorRouter.get('/api/users', async (req, res) => {
 
 // ... existing code ...
 module.exports = authorRouter;
-
-module.exports= authorRouter;
