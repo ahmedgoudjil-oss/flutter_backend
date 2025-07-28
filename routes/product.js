@@ -196,27 +196,28 @@ productRouter.put('/api/edit-product/:productId', auth, vendorAuth, async (req, 
 });
 
 // Fetch products by vendor ID
+
 productRouter.get('/api/product/vendor/:vendorId', auth, vendorAuth, async (req, res) => {
   try {
-    // Extract vendor ID from the request parameters
     const { vendorId } = req.params;
-    
-    // Validate if the vendor exists
+    console.log("Fetching products for vendor:", vendorId);
+
     const vendorExist = await Vendor.findById(vendorId);
-    
     if (!vendorExist) {
+      console.log("Vendor not found!");
       return res.status(404).json({ msg: "Vendor not found" });
     }
-    
-    // Fetch products associated with the vendor ID
+
     const products = await Product.find({ vendorId });
-    
+    console.log("Found products:", products.length);
     return res.status(200).json(products);
-    
+
   } catch (e) {
+    console.error("Error in /api/product/vendor/:vendorId:", e);
     return res.status(500).json({ error: e.message });
   }
 });
+
 
 
 module.exports=productRouter;

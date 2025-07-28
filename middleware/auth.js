@@ -33,9 +33,10 @@ const auth = async (req, res, next) => {
 const vendorAuth = async (req, res, next) => {
     try {
         //check if the user makes a request is vendor
-     if (!req.user.role || !req.user.role== 'vendor') {
-            return res.status(403).json({ msg: 'Access denied. Not a vendor.' });
-        }
+    if (!req.user.role || req.user.role !== 'vendor') {
+  return res.status(403).json({ msg: 'Access denied. Not a vendor.' });
+}
+
         next();
     } catch (error) {
         
