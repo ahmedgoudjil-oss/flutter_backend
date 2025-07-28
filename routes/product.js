@@ -196,7 +196,7 @@ productRouter.put('/api/edit-product/:productId', auth, vendorAuth, async (req, 
 });
 
 // Fetch products by vendor ID
-productRouter.get('vendor/:vendorId', auth, vendorAuth, async (req, res) => {
+productRouter.get('/api/product/vendor/:vendorId', auth, vendorAuth, async (req, res) => {
   try {
     // Extract vendor ID from the request parameters
     const { vendorId } = req.params;
