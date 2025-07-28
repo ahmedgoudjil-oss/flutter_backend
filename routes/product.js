@@ -1,5 +1,6 @@
 const express = require('express');
 const Product = require('../models/product');
+const Vendor = require('../models/vendor');
 const productRouter = express.Router();
 const { auth, vendorAuth } = require('../middleware/auth');
 const e = require('express');
@@ -188,6 +189,29 @@ productRouter.put('/api/edit-product/:productId', auth, vendorAuth, async (req, 
     );
     
     return res.status(200).json(updatedProduct);
+    
+  } catch (e) {
+    return res.status(500).json({ error: e.message });
+  }
+});
+
+// Fetch products by vendor ID
+productRouter.get('vendor/:vendorId', auth, vendorAuth, async (req, res) => {
+  try {
+    // Extract vendor ID from the request parameters
+    const { vendorId } = req.params;
+    
+    // Validate if the vendor exists
+    const vendorExist = await Vendor.findById(vendorId);
+    
+    if (!vendorExist) {
+      return res.status(404).json({ msg: "Vendor not found" });
+    }
+    
+    // Fetch products associated with the vendor ID
+    const products = await Product.find({ vendorId });
+    
+    return res.status(200).json(products);
     
   } catch (e) {
     return res.status(500).json({ error: e.message });

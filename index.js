@@ -1,37 +1,44 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require("cors"); // استيراد cors أولًا
+const cors = require("cors");
+
+// استيراد الراوترات
 const authRouter = require("./routes/auth");
-const bannerRouter= require("./routes/banner");
-const categoryRouter= require('./routes/category');
-const subcategoryRouter=require('./routes/sub_category');
+const bannerRouter = require("./routes/banner");
+const categoryRouter = require('./routes/category');
+const subcategoryRouter = require('./routes/sub_category');
 const productRouter = require('./routes/product');
-const productReviewRouter= require('./routes/product_review');
+const productReviewRouter = require('./routes/product_review');
 const vendorRouter = require('./routes/vendor');
-const OrderRouter = require('./routes/order'); // استيراد راوتر الطلبات
-const Order = require('./models/order'); // استيراد نموذج الطلبات
+const OrderRouter = require('./routes/order');
+const Order = require('./models/order');
 
-const dotenv = require('dotenv');
+const app = express();
 
-// Load environment variables
-dotenv.config();
-
-const app = express(); // ✅ تعريف app هنا أولًا
-
-app.use(cors()); // ✅ تفعيل cors بعد تعريف app
-
-const PORT = process.env.PORT || 3000;
-const DB = process.env.MONGODB_URI;
-
-// إعدادات Express
+// إعدادات عامة
+app.use(cors());
 app.use(express.json());
 
-// Health check endpoint
-app.get('/', (req, res) => {
-    res.json({ message: 'Backend API is running successfully!' });
+// إعدادات السيرفر
+const PORT = 3000;
+
+// الاتصال بقاعدة البيانات مباشرة بدون .env
+const DB = "mongodb+srv://agoudjil381:sfvTucAiLbIGdI05@cluster0.aglpeor.mongodb.net/ahmedapp?retryWrites=true&w=majority";
+
+mongoose.connect(DB, {
+  dbName: "ahmedapp",
+}).then(() => {
+  console.log("✅ MongoDB connected");
+}).catch((err) => {
+  console.error("❌ MongoDB connection error:", err);
 });
 
-// ربط الراوترات
+// نقطة فحص للتأكد من عمل السيرفر
+app.get('/', (req, res) => {
+  res.json({ message: 'Backend API is running successfully!' });
+});
+
+// ربط جميع الراوترات
 app.use(authRouter);
 app.use(bannerRouter);
 app.use(categoryRouter);
@@ -39,27 +46,20 @@ app.use(subcategoryRouter);
 app.use(productRouter);
 app.use(productReviewRouter);
 app.use(vendorRouter);
-app.use(OrderRouter); // ربط راوتر الطلبات
+app.use(OrderRouter);
 
-// Error handling middleware
+// ميدلوير الأخطاء العامة
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ error: 'Something went wrong!' });
+  console.error(err.stack);
+  res.status(500).json({ error: 'Something went wrong!' });
 });
 
-// 404 handler
+// ميدلوير 404
 app.use('*', (req, res) => {
-    res.status(404).json({ error: 'Route not found' });
-});
-
-// الاتصال بقاعدة البيانات MongoDB
-mongoose.connect(DB).then(() => {
-    console.log("MongoDB connected");
-}).catch((err) => {
-    console.error("MongoDB connection error:", err);
+  res.status(404).json({ error: 'Route not found' });
 });
 
 // تشغيل السيرفر
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server is running on port ${PORT}`);
+  console.log(`🚀 Server is running on port ${PORT}`);
 });
