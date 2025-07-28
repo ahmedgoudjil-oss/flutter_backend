@@ -20,7 +20,7 @@ app.use(cors());
 app.use(express.json());
 
 // إعدادات السيرفر
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // الاتصال بقاعدة البيانات مباشرة بدون .env
 const DB = "mongodb+srv://agoudjil381:sfvTucAiLbIGdI05@cluster0.aglpeor.mongodb.net/ahmedapp?retryWrites=true&w=majority";
@@ -63,3 +63,4 @@ app.use('*', (req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server is running on port ${PORT}`);
 });
+
