@@ -5,7 +5,7 @@ const productRouter = express.Router();
 const { auth, vendorAuth } = require('../middleware/auth');
 const e = require('express');
 
-productRouter.post('/api/add-product', async(req,res)=>{
+productRouter.post('/api/add-product',auth,vendorAuth, async(req,res)=>{
 try {
     const {productName,productPrice, quantity,description,category,vendorId,fullName,subCategory,images}= req.body;
      const product= new Product( {productName,productPrice, quantity,description,category,vendorId,fullName,subCategory,images});
@@ -161,7 +161,7 @@ productRouter.get('/api/search-product', async (req, res) => {
 });
 
 // Route to edit/update an existing product
-productRouter.put('/api/edit-product/:productId', async (req, res) => {
+productRouter.put('/api/edit-product/:productId', auth, vendorAuth, async (req, res) => {
   try {
     // Extract product ID from the request parameters
     const { productId } = req.params;
@@ -197,7 +197,7 @@ productRouter.put('/api/edit-product/:productId', async (req, res) => {
 
 // Fetch products by vendor ID
 
-productRouter.get('/api/product/vendor/:vendorId', async (req, res) => {
+productRouter.get('/api/product/vendor/:vendorId', auth, vendorAuth, async (req, res) => {
   try {
     const { vendorId } = req.params;
     console.log("Fetching products for vendor:", vendorId);
