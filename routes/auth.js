@@ -40,7 +40,12 @@ return res.status(400).json({msg:"User not found with this email"});
     if(!isMatch){
         return res.status(400).json({msg:"Incorrect password"});
     }else{
-        const token = jwt.sign({id: findUser._id},"passwordKey");
+        const token = jwt.sign(
+            { id: findUser._id },
+            "passwordKey",
+            { expiresIn: "10d" } // أو "1d" أو "2h" حسب ما تحب
+          );
+          
          const {password, ...userWithoutPassword}= findUser._doc;
 
          res.json({token,user:userWithoutPassword} );

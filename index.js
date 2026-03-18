@@ -1,9 +1,10 @@
-const express = require('express');
+const express = require('express'); 
 const mongoose = require('mongoose');
 const cors = require("cors");
+require('dotenv').config();
 
 // استيراد الراوترات
-const authRouter = require("./routes/auth");
+const authorRouter = require("./routes/auth");
 const bannerRouter = require("./routes/banner");
 const categoryRouter = require('./routes/category');
 const subcategoryRouter = require('./routes/sub_category');
@@ -11,35 +12,36 @@ const productRouter = require('./routes/product');
 const productReviewRouter = require('./routes/product_review');
 const vendorRouter = require('./routes/vendor');
 const OrderRouter = require('./routes/order');
-const Order = require('./models/order');
 
 const app = express();
 
-// إعدادات عامة
+// Middleware عام
 app.use(cors());
 app.use(express.json());
 
 // إعدادات السيرفر
 const PORT = process.env.PORT || 3000;
 
-// الاتصال بقاعدة البيانات مباشرة بدون .env
-const DB = "mongodb+srv://agoudjil381:sfvTucAiLbIGdI05@cluster0.aglpeor.mongodb.net/ahmedapp?retryWrites=true&w=majority";
+// الاتصال بقاعدة البيانات
+// استخدام الرابط من .env مباشرة بدون dbName لأنه موجود في URI
+const DB = process.env.DB;
 
-mongoose.connect(DB, {
-  dbName: "ahmedapp",
-}).then(() => {
-  console.log("✅ MongoDB connected");
-}).catch((err) => {
-  console.error("❌ MongoDB connection error:", err);
+mongoose.connect(DB)
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch(err => console.error("❌ MongoDB connection error:", err));
+
+// تأكيد أن الاتصال مفتوح
+mongoose.connection.once('open', () => {
+  console.log("✅ MongoDB connection is open and ready!");
 });
 
-// نقطة فحص للتأكد من عمل السيرفر
+// نقطة فحص للسيرفر
 app.get('/', (req, res) => {
   res.json({ message: 'Backend API is running successfully!' });
 });
 
-// ربط جميع الراوترات
-app.use(authRouter);
+// ربط الراوترات
+app.use(authorRouter);
 app.use(bannerRouter);
 app.use(categoryRouter);
 app.use(subcategoryRouter);
@@ -48,7 +50,7 @@ app.use(productReviewRouter);
 app.use(vendorRouter);
 app.use(OrderRouter);
 
-// ميدلوير الأخطاء العامة
+// ميدلوير للأخطاء العامة
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Something went wrong!' });
@@ -63,4 +65,3 @@ app.use('*', (req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server is running on port ${PORT}`);
 });
-

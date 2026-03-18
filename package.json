@@ -20,7 +20,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.17.0",
     "mongoose": "^8.16.1",
-    "nodemailer": "^7.0.5"
+    "nodemailer": "^7.0.5",
+    "stripe": "^20.4.1"
   },
   "engines": {
     "node": ">=14.0.0"
