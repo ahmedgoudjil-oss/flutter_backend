@@ -66,43 +66,16 @@ orderRouter.post('/api/orders', async (req, res) => {
 //payment route
 orderRouter.post('/api/payment', async (req, res) => {
   try {
-    const { orderId , paymentMethodId, currency='usd' } = req.body;
+   const { amount, currency,} = req.body;
+   const paymentIntent = await stripe.paymentIntents.create({
+    amount,
+    currency,
+   });
+   return res.status(200).json(paymentIntent);
 
-    if (!orderId || !paymentMethodId || !currency) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-    const order = await Order.findById(orderId);
-    if (!order) {
-      return res.status(404).json({ error: "Order not found" });
-    }
-    // cqlculate total amount 
-    const totalAmount = order.productPrice * order.quantity ; 
-    //ensure amount is at least 0.5 dollarsto avoid Stripe errors
-    const minimumAmount = 0.5;
-     if (totalAmount < minimumAmount) {
-      return res.status(400).json({ error: `Total amount must be at least ${minimumAmount} ${currency}` });
-    }
-    //convert to cents for Stripe
-    const amountInCents = Math.round(totalAmount * 100);
-    //create payment intent
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: amountInCents,
-      currency: currency,
-      payment_method: paymentMethodId,
-      automatic_payment_methods: {
-        enabled: true,
-      },
-     
-    });
-    return res.status(200).json({
-      status: 'success',
-      paymentIntentId: paymentIntent.id,
-      amount: paymentIntent.amount/100, // convert back to dollars
-      currency: paymentIntent.currency,
-    });
 
   } catch (error) {
-    console.error('Error creating payment intent:', error);
+    
     return res.status(500).json({ error: error.message });
   }
 });
