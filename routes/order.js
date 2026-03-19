@@ -64,7 +64,7 @@ orderRouter.post('/api/orders', async (req, res) => {
 });
 
 //payment route
-orderRouter.post('/api/payment', async (req, res) => {
+orderRouter.post('/api/payment', auth,async (req, res) => {
   try {
    const { amount, currency,} = req.body;
    const paymentIntent = await stripe.paymentIntents.create({
