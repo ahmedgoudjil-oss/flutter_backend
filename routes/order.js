@@ -1,6 +1,7 @@
 const express = require('express');
 const orderRouter = express.Router();
 const Order = require('../models/order');
+const auth = require("../middleware/auth");
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 // 🔥 Helper function (باش نتفاداو المشاكل)
 const sendOrders = (res, orders) => {
@@ -64,7 +65,7 @@ orderRouter.post('/api/orders', async (req, res) => {
 });
 
 //payment route
-orderRouter.post('/api/payment', auth,async (req, res) => {
+orderRouter.post('/api/payment',async (req, res) => {
   try {
    const { amount, currency,} = req.body;
    const paymentIntent = await stripe.paymentIntents.create({
@@ -80,7 +81,7 @@ orderRouter.post('/api/payment', auth,async (req, res) => {
   }
 });
 
-orderRouter.get("/api/payment-intent/:id", async (req, res) => {
+orderRouter.get("/api/payment/:id", async (req, res) => {
   try {
     const paymentIntent = await stripe.paymentIntents.retrieve(
       req.params.id
