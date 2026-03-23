@@ -26,6 +26,10 @@ orderRouter.post('/api/orders', async (req, res) => {
       image,
       buyerId,
       vendorId,
+      paymentStatus,
+      paymentIntentId,
+      paymentMethod
+
     } = req.body;
 
     // ✅ Validation (مهم جدًا)
@@ -50,6 +54,9 @@ orderRouter.post('/api/orders', async (req, res) => {
       createdAt: Date.now(),
       delivered: false,
       processing: true,
+      paymentStatus,
+      paymentIntentId,
+      paymentMethod
     });
 
     await order.save();
