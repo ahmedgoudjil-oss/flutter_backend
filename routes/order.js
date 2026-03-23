@@ -1,7 +1,8 @@
 const express = require('express');
 const orderRouter = express.Router();
 const Order = require('../models/order');
-const auth = require("../middleware/auth");
+const { auth, vendorAuth } = require('../middleware/auth');
+
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 // 🔥 Helper function (باش نتفاداو المشاكل)
 const sendOrders = (res, orders) => {
