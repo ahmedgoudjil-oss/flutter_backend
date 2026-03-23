@@ -80,6 +80,18 @@ orderRouter.post('/api/payment', auth,async (req, res) => {
   }
 });
 
+orderRouter.get("/api/payment-intent/:id", async (req, res) => {
+  try {
+    const paymentIntent = await stripe.paymentIntents.retrieve(
+      req.params.id
+    );
+
+    res.status(200).json(paymentIntent);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ================== GET ORDERS BY BUYER ==================
 orderRouter.get('/api/orders/buyer/:buyerId', async (req, res) => {
   try {
