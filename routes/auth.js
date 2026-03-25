@@ -8,7 +8,7 @@ const sendVerificationEmail = require('../utils/mailer');
 const authorRouter = express.Router();
 
 // ================= Signup =================
-authorRouter.post('/api/signup', async (req, res) => {
+authorRouter.post('/signup', async (req, res) => {
   try {
     const { fullName, email, password } = req.body;
 
@@ -17,11 +17,9 @@ authorRouter.post('/api/signup', async (req, res) => {
       return res.status(400).json({ msg: "Email Already exists" });
     }
 
-    // تشفير كلمة المرور
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // إنشاء Token للتحقق
     const token = crypto.randomBytes(32).toString('hex');
 
     let user = new User({
@@ -29,12 +27,11 @@ authorRouter.post('/api/signup', async (req, res) => {
       email,
       password: hashedPassword,
       verificationToken: token,
-      tokenExpires: Date.now() + 3600000, // 1 ساعة
+      tokenExpires: Date.now() + 3600000, // 1 hour
     });
 
     user = await user.save();
 
-    // إرسال رابط التحقق
     await sendVerificationEmail(email, token);
 
     res.json({ msg: "Signup successful! Check your email to verify your account." });
@@ -45,7 +42,7 @@ authorRouter.post('/api/signup', async (req, res) => {
 });
 
 // ================= Verify Email =================
-authorRouter.get('/api/verify-email', async (req, res) => {
+authorRouter.get('/verify-email', async (req, res) => {
   try {
     const { token } = req.query;
 
@@ -54,7 +51,7 @@ authorRouter.get('/api/verify-email', async (req, res) => {
       tokenExpires: { $gt: Date.now() },
     });
 
-    if (!user) return res.send("❌ Token invalid or expired");
+    if (!user) return res.status(400).send("❌ Token invalid or expired");
 
     user.isVerified = true;
     user.verificationToken = null;
@@ -70,7 +67,7 @@ authorRouter.get('/api/verify-email', async (req, res) => {
 });
 
 // ================= Signin =================
-authorRouter.post('/api/signin', async (req, res) => {
+authorRouter.post('/signin', async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -87,7 +84,9 @@ authorRouter.post('/api/signin', async (req, res) => {
       { expiresIn: "10d" }
     );
 
-    const { password: pwd, ...userWithoutPassword } = findUser._doc;
+    // ✅ Fix: use .toObject() instead of ._doc
+    const userObj = findUser.toObject();
+    const { password: pwd, ...userWithoutPassword } = userObj;
 
     res.json({ token, user: userWithoutPassword });
 
@@ -97,16 +96,17 @@ authorRouter.post('/api/signin', async (req, res) => {
 });
 
 // ================= Update user info =================
-authorRouter.put('/api/users/:id', async (req, res) => {
+authorRouter.put('/users/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { state, city, locality } = req.body;
 
+    // ✅ Fix: exclude password from response
     const updatedUser = await User.findByIdAndUpdate(
       id,
       { state, city, locality },
       { new: true }
-    );
+    ).select('-password');
 
     if (!updatedUser) return res.status(404).json({ error: 'User not found' });
 
@@ -118,9 +118,9 @@ authorRouter.put('/api/users/:id', async (req, res) => {
 });
 
 // ================= Get all users =================
-authorRouter.get('/api/users', async (req, res) => {
+authorRouter.get('/users', async (req, res) => {
   try {
-    const users = await User.find().select('-password'); // استبعاد كلمة المرور
+    const users = await User.find().select('-password');
     res.json(users);
   } catch (e) {
     res.status(500).json({ error: e.message });

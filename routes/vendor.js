@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 
-vendorRouter.post('/api/vendor/signup',async(req,res)=>{
+vendorRouter.post('vendor/signup',async(req,res)=>{
 try {
     const {fullName,email,password}= req.body;
     const existingEmail = await Vendor.findOne({email});
@@ -26,7 +26,7 @@ try {
 }
 });
 //sign in api endpoint
-vendorRouter.post('/api/vendor/signin',async(req,res)=>{
+vendorRouter.post('vendor/signin',async(req,res)=>{
 try {
     const {email,password}= req.body;
 const findUser = await Vendor.findOne({email});
@@ -56,7 +56,7 @@ return res.status(400).json({msg:"Vendor not found with this email"});
 });
 
 // Fetch all vendors, excluding password
-vendorRouter.get('/api/vendors', async (req, res) => {
+vendorRouter.get('vendors', async (req, res) => {
   try {
     const vendors = await Vendor.find().select('-password'); // Exclude password field
     res.json(vendors);
@@ -64,13 +64,6 @@ vendorRouter.get('/api/vendors', async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
-vendorRouter.get('/api/vendors', async (req, res) => {
-    try {
-      const vendors = await Vendor.find().select('-password'); // Exclude password field
-      res.json(vendors);
-    } catch (e) {
-      res.status(500).json({ error: e.message });
-    }
-  });
+
    
 module.exports= vendorRouter;

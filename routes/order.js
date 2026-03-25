@@ -11,7 +11,7 @@ const sendOrders = (res, orders) => {
 
 
 // ================== CREATE ORDER ==================
-orderRouter.post('/api/orders', async (req, res) => {
+orderRouter.post('orders', async (req, res) => {
   try {
     const {
       fullName,
@@ -73,7 +73,7 @@ orderRouter.post('/api/orders', async (req, res) => {
 });
 
 //payment route
-orderRouter.post('/api/payment',auth,async (req, res) => {
+orderRouter.post('payment',auth,async (req, res) => {
   try {
    const { amount, currency,} = req.body;
    const paymentIntent = await stripe.paymentIntents.create({
@@ -89,7 +89,7 @@ orderRouter.post('/api/payment',auth,async (req, res) => {
   }
 });
 
-orderRouter.get("/api/payment/:id",auth,async (req, res) => {
+orderRouter.get("payment/:id",auth,async (req, res) => {
   try {
     const paymentIntent = await stripe.paymentIntents.retrieve(
       req.params.id
@@ -102,7 +102,7 @@ orderRouter.get("/api/payment/:id",auth,async (req, res) => {
 });
 
 // ================== GET ORDERS BY BUYER ==================
-orderRouter.get('/api/orders/buyer/:buyerId', async (req, res) => {
+orderRouter.get('orders/buyer/:buyerId', async (req, res) => {
   try {
     const { buyerId } = req.params;
 
@@ -118,7 +118,7 @@ orderRouter.get('/api/orders/buyer/:buyerId', async (req, res) => {
 
 
 // ================== GET ORDERS BY VENDOR ==================
-orderRouter.get('/api/orders/vendor/:vendorId', async (req, res) => {
+orderRouter.get('orders/vendor/:vendorId', async (req, res) => {
   try {
     const { vendorId } = req.params;
 
@@ -134,7 +134,7 @@ orderRouter.get('/api/orders/vendor/:vendorId', async (req, res) => {
 
 
 // ================== DELETE ORDER ==================
-orderRouter.delete('/api/orders/:id', async (req, res) => {
+orderRouter.delete('orders/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -156,7 +156,7 @@ orderRouter.delete('/api/orders/:id', async (req, res) => {
 
 
 // ================== MARK AS DELIVERED ==================
-orderRouter.patch('/api/orders/:id/delivered', async (req, res) => {
+orderRouter.patch('orders/:id/delivered', async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -180,7 +180,7 @@ orderRouter.patch('/api/orders/:id/delivered', async (req, res) => {
 
 
 // ================== MARK AS PROCESSING ==================
-orderRouter.patch('/api/orders/:id/processing', async (req, res) => {
+orderRouter.patch('orders/:id/processing', async (req, res) => {
   try {
     const { id } = req.params;
 
