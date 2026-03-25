@@ -41,7 +41,7 @@ app.get('/', (req, res) => {
 });
 
 // ربط الراوترات
-app.use('/api/auth', authorRouter);
+app.use(authorRouter);
 app.use(bannerRouter);
 app.use(categoryRouter);
 app.use(subcategoryRouter);
