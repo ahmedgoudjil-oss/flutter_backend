@@ -3,7 +3,7 @@ require('dotenv').config();
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || "smtp.testmail.app",
-  port: 587,
+  port: 2525,
   auth: {
     user: process.env.SMTP_USER || "sigj7.test@inbox.testmail.app",
     pass: process.env.SMTP_PASS || "1d736d8b-c0f1-4f71-903b-020ed5b198dc"
