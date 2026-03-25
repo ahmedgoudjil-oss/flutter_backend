@@ -7,7 +7,7 @@ const Product = require('../models/product');
 const productReviewRouter = express.Router();
 
 // إنشاء مراجعة جديدة لمنتج
-productReviewRouter.post('product-review', async (req, res) => {
+productReviewRouter.post('/api/product-review', async (req, res) => {
   try {
     const { buyerId, email, fullName, productId, rating, review } = req.body;
        const existingReview = await ProductReview.findOne({ buyerId, productId });

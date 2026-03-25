@@ -3,7 +3,7 @@ const SubCategory = require('../models/sub_category');
 const SubcategoryRouter= express.Router();
 
 
-SubcategoryRouter.post('subcategories',async(req,res)=>{
+SubcategoryRouter.post('/api/subcategories',async(req,res)=>{
 try {
     const { categoryId,categoryName,image,subCategoryName}= req.body;
      const subcategory= new SubCategory( {categoryId,categoryName,image,subCategoryName});
@@ -14,7 +14,7 @@ try {
     res.status(500).json({error:e.message});
 }
 });
-SubcategoryRouter.get('subcategories',async(req,res)=>{
+SubcategoryRouter.get('/api/subcategories',async(req,res)=>{
 try {
    const subcategories= await SubCategory.find();
    return res.status(200).send(subcategories);
@@ -25,7 +25,7 @@ try {
 }
 });
 
-SubcategoryRouter.get('category/:categoryName/subcategories', async (req, res) => {
+SubcategoryRouter.get('/api/category/:categoryName/subcategories', async (req, res) => {
   try {
     // استخراج categoryName من الرابط
     const { categoryName } = req.params;

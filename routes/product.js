@@ -12,7 +12,7 @@ const sendProducts = (res, products) => {
 
 
 // ================== ADD PRODUCT ==================
-productRouter.post('add-product', auth, vendorAuth, async (req, res) => {
+productRouter.post('/api/add-product', auth, vendorAuth, async (req, res) => {
   try {
     const {
       productName,
@@ -48,7 +48,7 @@ productRouter.post('add-product', auth, vendorAuth, async (req, res) => {
 
 
 // ================== POPULAR ==================
-productRouter.get('popular-product', async (req, res) => {
+productRouter.get('/api/popular-product', async (req, res) => {
   try {
     const products = await Product.find({ popular: true });
     return sendProducts(res, products);
@@ -59,7 +59,7 @@ productRouter.get('popular-product', async (req, res) => {
 
 
 // ================== RECOMMENDED ==================
-productRouter.get('recommended-product', async (req, res) => {
+productRouter.get('/api/recommended-product', async (req, res) => {
   try {
     const products = await Product.find({ recommend: true });
     return sendProducts(res, products);
@@ -70,7 +70,7 @@ productRouter.get('recommended-product', async (req, res) => {
 
 
 // ================== BY CATEGORY ==================
-productRouter.get('products-by-category/:category', async (req, res) => {
+productRouter.get('/api/products-by-categroy/:category', async (req, res) => {
   try {
     const { category } = req.params;
     const products = await Product.find({ category });
@@ -82,7 +82,7 @@ productRouter.get('products-by-category/:category', async (req, res) => {
 
 
 // ================== RELATED ==================
-productRouter.get('related-products-by-subcategory/:productId', async (req, res) => {
+productRouter.get('/api/related-products-by-subcategory/:productId', async (req, res) => {
   try {
     const { productId } = req.params;
 
@@ -105,7 +105,7 @@ productRouter.get('related-products-by-subcategory/:productId', async (req, res)
 
 
 // ================== TOP RATED ==================
-productRouter.get('top-rated-products', async (req, res) => {
+productRouter.get('/api/top-rated-products', async (req, res) => {
   try {
     const products = await Product.find()
       .sort({ averageRating: -1 })
@@ -119,7 +119,7 @@ productRouter.get('top-rated-products', async (req, res) => {
 
 
 // ================== BY SUBCATEGORY ==================
-productRouter.get('product-by-subcategory/:subCategory', async (req, res) => {
+productRouter.get('/api/product-by-subcategory/:subCategory', async (req, res) => {
   try {
     const { subCategory } = req.params;
     const products = await Product.find({ subCategory });
@@ -131,7 +131,7 @@ productRouter.get('product-by-subcategory/:subCategory', async (req, res) => {
 
 
 // ================== SEARCH ==================
-productRouter.get('search-product', async (req, res) => {
+productRouter.get('/api/search-product', async (req, res) => {
   try {
     const { query } = req.query;
 
@@ -155,7 +155,7 @@ productRouter.get('search-product', async (req, res) => {
 
 
 // ================== EDIT PRODUCT ==================
-productRouter.put('edit-product/:productId', auth, vendorAuth, async (req, res) => {
+productRouter.put('/api/edit-product/:productId', auth, vendorAuth, async (req, res) => {
   try {
     const { productId } = req.params;
 
@@ -185,7 +185,7 @@ productRouter.put('edit-product/:productId', auth, vendorAuth, async (req, res) 
 
 
 // ================== BY VENDOR ==================
-productRouter.get('product/vendor/:vendorId', auth, vendorAuth, async (req, res) => {
+productRouter.get('/api/product/vendor/:vendorId', auth, vendorAuth, async (req, res) => {
   try {
     const { vendorId } = req.params;
 
