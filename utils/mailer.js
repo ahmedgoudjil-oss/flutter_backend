@@ -2,21 +2,21 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: process.env.SMTP_HOST || "smtp.testmail.app",
+  port: 587,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS, // App Password
+    user: process.env.SMTP_USER || "sigj7.test@inbox.testmail.app",
+    pass: process.env.SMTP_PASS || "1d736d8b-c0f1-4f71-903b-020ed5b198dc"
   },
-  logger: true, // لتتبع الأخطاء
-  debug: true,
+  logger: true,
+  debug: true
 });
 
 async function sendVerificationEmail(email, token) {
-  // استخدم رابط التطبيق على Render وليس localhost
-  const link = `https://flutter-backend-1-xv48.onrender.com/api/auth/verify-email?token=${token}`;
+  const link = `${process.env.BACKEND_URL}/api/auth/verify-email?token=${token}`;
 
   await transporter.sendMail({
-    from: `"My App" <${process.env.EMAIL_USER}>`,
+    from: `"My App" <${process.env.SMTP_USER}>`,
     to: email,
     subject: "Verify your email",
     html: `
@@ -25,6 +25,8 @@ async function sendVerificationEmail(email, token) {
       <a href="${link}" style="padding:10px 20px;background:blue;color:white;text-decoration:none;">Verify Email</a>
     `,
   });
+
+  console.log(`✅ Verification email sent to ${email}`);
 }
 
 module.exports = sendVerificationEmail;
