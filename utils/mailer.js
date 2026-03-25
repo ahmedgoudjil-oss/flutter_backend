@@ -7,10 +7,13 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS, // App Password
   },
+  logger: true, // لتتبع الأخطاء
+  debug: true,
 });
 
 async function sendVerificationEmail(email, token) {
-  const link = `http://localhost:${process.env.PORT}/api/auth/verify-email?token=${token}`;
+  // استخدم رابط التطبيق على Render وليس localhost
+  const link = `https://flutter-backend-1-xv48.onrender.com/api/auth/verify-email?token=${token}`;
 
   await transporter.sendMail({
     from: `"My App" <${process.env.EMAIL_USER}>`,
