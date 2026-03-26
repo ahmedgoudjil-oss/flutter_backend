@@ -17,6 +17,8 @@
     "crypto": "^1.0.1",
     "dotenv": "^17.2.1",
     "express": "^4.21.2",
+    "firebase": "^12.11.0",
+    "firebase-admin": "^13.7.0",
     "heroku": "^8.7.1",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.17.0",

@@ -1,103 +1,49 @@
 const express = require('express');
-const User = require('../models/user');
-const bcrypt = require('bcryptjs');
+const User = require('../models/User');
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
-const sendVerificationEmail = require('../utils/mailer');
+const admin = require('../utils/firebaseAdmin'); // Firebase Admin initialized
 
-const authorRouter = express.Router();
+const authRouter = express.Router();
 
-// ================= Signup =================
-authorRouter.post('/api/signup', async (req, res) => {
+// ================= Signin / Signup via Firebase =================
+authRouter.post('/api/signin', async (req, res) => {
   try {
-    const { fullName, email, password } = req.body;
+    const { idToken } = req.body;
+    if (!idToken) return res.status(400).json({ msg: "idToken is required" });
 
-    const existingEmail = await User.findOne({ email });
-    if (existingEmail) {
-      return res.status(400).json({ msg: "Email Already exists" });
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+
+    if (!decodedToken.email_verified) {
+      return res.status(401).json({ msg: "Please verify your email first" });
     }
 
-    // تشفير كلمة المرور
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    let user = await User.findOne({ firebaseUID: decodedToken.uid });
 
-    // إنشاء Token للتحقق
-    const token = crypto.randomBytes(32).toString('hex');
-
-    let user = new User({
-      fullName,
-      email,
-      password: hashedPassword,
-      verificationToken: token,
-      tokenExpires: Date.now() + 3600000, // 1 ساعة
-    });
-
-    user = await user.save();
-
-    // إرسال رابط التحقق
-    await sendVerificationEmail(email, token);
-
-    res.json({ msg: "Signup successful! Check your email to verify your account." });
-
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-});
-
-// ================= Verify Email =================
-authorRouter.get('/api/verify-email', async (req, res) => {
-  try {
-    const { token } = req.query;
-
-    const user = await User.findOne({
-      verificationToken: token,
-      tokenExpires: { $gt: Date.now() },
-    });
-
-    if (!user) return res.send("❌ Token invalid or expired");
-
-    user.isVerified = true;
-    user.verificationToken = null;
-    user.tokenExpires = null;
-
-    await user.save();
-
-    res.send("✅ Email verified successfully");
-
-  } catch (e) {
-    res.status(500).send("Server error");
-  }
-});
-
-// ================= Signin =================
-authorRouter.post('/api/signin', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    const findUser = await User.findOne({ email });
-    if (!findUser) return res.status(400).json({ msg: "User not found with this email" });
-    if (!findUser.isVerified) return res.status(401).json({ msg: "Please verify your email first" });
-
-    const isMatch = await bcrypt.compare(password, findUser.password);
-    if (!isMatch) return res.status(400).json({ msg: "Incorrect password" });
+    // إذا أول تسجيل دخول → إنشاء المستخدم
+    if (!user) {
+      user = new User({
+        fullName: decodedToken.name || "User",
+        email: decodedToken.email,
+        firebaseUID: decodedToken.uid
+      });
+      await user.save();
+    }
 
     const token = jwt.sign(
-      { id: findUser._id },
+      { id: user._id },
       process.env.JWT_SECRET || "passwordKey",
       { expiresIn: "10d" }
     );
 
-    const { password: pwd, ...userWithoutPassword } = findUser._doc;
-
-    res.json({ token, user: userWithoutPassword });
+    res.json({ token, user });
 
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    res.status(401).json({ error: "Invalid Firebase token" });
   }
 });
 
-// ================= Update user info =================
-authorRouter.put('/api/users/:id', async (req, res) => {
+// ================= Update User Info =================
+authRouter.put('/api/users/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { state, city, locality } = req.body;
@@ -110,21 +56,20 @@ authorRouter.put('/api/users/:id', async (req, res) => {
 
     if (!updatedUser) return res.status(404).json({ error: 'User not found' });
 
-    res.status(200).json(updatedUser);
-
+    res.json(updatedUser);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
 });
 
-// ================= Get all users =================
-authorRouter.get('/api/users', async (req, res) => {
+// ================= Get All Users =================
+authRouter.get('/api/users', async (req, res) => {
   try {
-    const users = await User.find().select('-password'); // استبعاد كلمة المرور
+    const users = await User.find();
     res.json(users);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
 });
 
-module.exports = authorRouter;
+module.exports = authRouter;
