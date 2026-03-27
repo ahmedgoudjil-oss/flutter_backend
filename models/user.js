@@ -1,14 +1,55 @@
 const mongoose = require('mongoose');
+  const userSchema = mongoose.Schema({
+    fullName:{
+        type: String,
+        required: true,
+        trim : true,
+    },
+    email:{
+        type: String,
+        required: true,
+        trim : true,
+        validate : {
+            validator :(value)=>{
+                const result = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                return result.test(value);
+            
+            },
+            message : "enter a valid email adress",
 
-const userSchema = mongoose.Schema({
-  fullName: { type: String, required: true, trim: true },
-  email: { type: String, required: true, trim: true, unique: true },
-  firebaseUID: { type: String, required: true, unique: true },
-  state: { type: String, default: "" },
-  city: { type: String, default: "" },
-  locality: { type: String, default: "" },
-  createdAt: { type: Date, default: Date.now },
-});
+        },
+    },
+    password:{
+        type: String,
+        required: true,
+        trim : true,
+        validate : {
+            validator :(value)=>{
+                //check if password is at least 8 char
+                return value.length>=8;
 
-const User = mongoose.model("User", userSchema);
-module.exports = User;
+            
+            },
+            message : "password must be at least 8 character"
+
+        },
+    },
+    state:{
+        type: String,
+       default:"",
+        
+    },
+    city:{
+        type: String,
+        default:"",
+        
+    },
+    locality:{  
+        type: String,
+        default:"",
+    },
+    
+
+  });
+  const User =mongoose.model("User",userSchema);
+  module.exports= User;
